@@ -30,7 +30,8 @@ fi
 
 case "$OS" in
     linux) true; ;;
-    win)   if [ -n "$BUILD" ]; then
+    win|osx)
+           if [ -n "$BUILD" ]; then
              while read url sha; do
                FILE="${url##*/}"
                if [ ! -r "inputs/$FILE" ]; then
@@ -45,10 +46,16 @@ https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.bz2 8f32d
 https://www.openssl.org/source/openssl-1.1.1c.tar.gz f6fb3079ad15076154eda9413fed42877d668e7069d9b87396d0804fdb3f4c90
 https://curl.haxx.se/download/curl-7.65.0.tar.bz2 ea47c08f630e88e413c85793476e7e5665647330b6db35f5c19d72b3e339df5c
 https://zlib.net/zlib-1.2.11.tar.gz c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
+https://github.com/tpoechtrager/osxcross/archive/e0a171828a72a0d7ad4409489033536590008ebf.tar.gz 7ef00c27b76745d4b44e13f291df60318588aa7b5d1788aeba5aca569ac7e989
 _EOL_
+             if [ "$OS" = "osx" -a ! -r inputs/MacOSX10.15.sdk.tar.xz ]; then
+                 echo "Please download MacOSX10.15.sdk.tar.xz and place it in `pwd`/inputs." 1>&2
+                 echo "Also be sure to read and understand Apple's licensing terms." 1>&2
+                 exit 1
+             fi
            fi
            ;;
-    *)     echo "Unsupported OS '$OS', try 'linux' or 'win' instead!" 1>&2
+    *)     echo "Unsupported OS '$OS', try 'linux' or 'win' or 'osx' instead!" 1>&2
            exit 1
            ;;
 esac
@@ -57,12 +64,8 @@ if [ -n "$BUILD" ]; then
     tar cfz inputs/supplement.tar.gz -C ../.. supplement
 fi
 
-if [ -n "$BUILD" ]; then
-    tar cfz inputs/supplement.tar.gz -C ../.. supplement
-fi
-
 if [ "$#" -lt 1 ]; then
-    echo "Usage:\t$0 [-b | -s KEY_ID | -v] [-O linux|win] VERSION [builder-options]" 1>&2
+    echo "Usage:\t$0 [-b | -s KEY_ID | -v] [-O linux|win|osx] VERSION [builder-options]" 1>&2
     echo "\t$0 KEY_ID VERSION [builder-options]" 1>&2
     echo "-b\tbuild" 1>&2
     echo "-s\tsign" 1>&2
