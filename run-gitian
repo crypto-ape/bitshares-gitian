@@ -10,7 +10,7 @@ export PATH="$PATH:`pwd`/bin:`pwd`/libexec"
 BUILD=
 SIGN=
 VERIFY=
-OS=linux
+OS=win
 while [ "$1" = "-b" -o "$1" = "-s" -o "$1" = "-v" -o "$1" = "-O" ]; do
     case "$1" in
       -b) BUILD=1; ;;
